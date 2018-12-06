@@ -1,0 +1,4 @@
+Total tweets = 487
+English only tweets = 432
+Foreign language tweets = 54
+Total langdetect failures = 1
