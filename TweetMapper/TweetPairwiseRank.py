@@ -26,16 +26,18 @@ allTweetRank = {}
 unambiguousTweetRank = {}
 ambiguousTweetRank = {}
 
+# rank tweets from @param loaded tweet by ID dictionary object
 def setRank(tweetSetIn):
     resultDict = {}
     for ID, text in tweetSetIn.items():
         n = len(text)
+        # if tweet has a length of 1 or fewer assign score of -1
         try:
             if n > 1:
                 resultDict[ID] = [originalTweets[ID], 0]
+                # rank equals sum of pairwise relative frequency scores
                 for i in range(n - 1):
                     resultDict[ID][1] += relFreq[(text[i], text[i+1])]
-                # resultDict[ID][1] /= n
             else:
                 resultDict[ID] = [originalTweets[ID], -1]
         except Exception as e:

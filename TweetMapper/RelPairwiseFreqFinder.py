@@ -1,3 +1,5 @@
+# takes file of ambiguous tweets sorted by relative frequency rank and outputs a set
+
 from LocalDir import *
 from collections import defaultdict
 import pickle

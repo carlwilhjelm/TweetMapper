@@ -1,13 +1,8 @@
 # maintains directory structure of files
+from SuperDir import *
 
-# source file for tweets
-sourceDir = "D:\School\GSU\Skums\\tweets\APIStream.2018.09.17\\"
-# destination file for results
-localDir = sourceDir + "results\\"
 # file path for unambiguous dictionary
-unambiguousWordsListFile = "D:\School\GSU\Skums\dictionary\metaDictUnambiguous.ListObj"
-# path for pairwise results
-pairwiseDir = localDir + "\pairwiseResults\\"
+unambiguousWordsListFile = dictDir + "metaDictUnambiguous.ListObj"
 # where dict of full tweets by id is stored
 rawTweetByIdDictFile = localDir + "RawTweetByID.DictObj"
 # where text of lang filter results are stored
@@ -48,3 +43,15 @@ pairwiseRankAmbiguousTweetsTextResultsFile = pairwiseDir + "PairwiseRankAmbiguou
 pairwiseRankAmbiguousTweetsDictFile = pairwiseDir + "PairwiseRankAmbiguousTweets.DictObj"
 # output file for unambiguous Tweet Rank list
 pairwiseRankAmbiguousTweetsListFile = pairwiseDir + "PairwiseRankAmbiguousTweets.ListObj"
+# where text of set of ranked ambiguous tweets is stored
+pairwiseRankSetAmbiguousTweetsTextResultsFile = pairwiseDir +"PairwiseRankSetAmbiguousTweets.txt"
+# output file for set of ranked ambiguous tweets list
+pairwiseRankSetAmbiguousTweetsListFile = pairwiseDir +"PairwiseRankSetAmbiguousTweets.txt"
+# where text of labeled set of ambiguous tweets is stored
+labeledAmbiguousTweetSetTextResultsFile = labelDir + "LabeledAmbiguousTweetSet.txt"
+# output file for labeled set of ambiguous tweets
+labeledAmbiguousTweetSetListFile = labelDir + "LabeledAmbiguousTweetSet.ListObj"
+# file for int variable tracking number of labels completed
+labelCountFile = labelDir + "LabelCount.var"
+# file for list tracking skipped indexes in LabelMaker
+labelSkippedFile = labelDir + "LabelSkipped.ListObj"
