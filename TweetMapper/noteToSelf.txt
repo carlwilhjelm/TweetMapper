@@ -1,0 +1,5 @@
+BayesByWordDictCreator.py takes tweets from sortedBayesPredictionsListFile
+which is made by TweetBayesModel.py which takes them from ambiguousTokenizedTweetsDictFile
+instead of pairwiseRankSetAmbiguousTweetsListFile and therefore makes BayesByWordDictRankSet.py necessary
+this could be deprecated in later versions and made more efficient but the model would then rely on PairwiseTweetRank.py
+DO NOT FORGET the reverse() logic is in the BayesByWordDictRankSet.py code

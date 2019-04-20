@@ -1,15 +1,14 @@
-import json
-import tweepy
+from LocalDir import *
 import pickle
+import tweepy
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy.streaming import StreamListener
-outputFile = "D:\School\GSU\Skums\\tweets\\tweetStream.2018.11.01.json"
-dct = ['wickr']
+outputFile = "D:\School\GSU\Skums\\tweets\\tweetStream.2019.04.15.json"
 
-# dictFile = "./metaDictUnambiguousObj.txt"
-# with open(dictFile, "rb") as f:
-#     dct = pickle.load(f)
+dictFile = "./metaDictUnambiguousObj.txt"
+with open(allWordsListFile, "rb") as f:
+    dct = pickle.load(f)
 
 consumer_key = 'zxpk8eJfTd0gGBC3lysulS2MI'
 consumer_secret = 'B5ycQyucfRoF17KjTjYAsKa3j8hLukJZokJjOIenYKmdcKWl77'

@@ -1,10 +1,15 @@
-# takes set of ambiguous tweets and outputs labels 1 for does have to do with drugs 0 for not
+# takes set of ambiguous tweets and alows user to create labels
+# 1 for does have to do with drugs 0 for not
 from LocalDir import *
 import pickle
 import textwrap
 
+# takes list file of tweet text
 with open(pairwiseRankSetAmbiguousTweetsListFile, 'rb') as f:
     tweetSet = pickle.load(f)
+
+with open(allEnglishTweetsByIdDictFile, 'rb') as f:
+    originalTweets = pickle.load(f)
 
 try:
     with open(labeledAmbiguousTweetSetListFile, 'rb') as f:
@@ -31,7 +36,8 @@ except:
     skipped = []
     print("no prior skipped / error loading previous skipped")
 
-prompt = 'label must be 1, 0, 9 to back, 7 to skip, or 321 to save and exit, \nor 999 to reset all saves \n'
+prompt = 'label must be 1, 0, 9 to back, 7 to skip, 5 to see original text, ' \
+         '\n 321 to save and exit, or 999 to reset all saves \n'
 
 print(prompt)
 textResults = ""
@@ -39,13 +45,18 @@ textResults = ""
 i = totalIndex
 
 while i < len(tweetSet):
-    text = tweetSet[i][0]
+    ID = tweetSet[i][0]
+    tokens = tweetSet[i][1][0]
+    text = " ".join(tokens)
     label = input(textwrap.fill(text, width=150, drop_whitespace=False))
     if label == '1' or label == '0':
         print('label = ' + str(label) + '\n')
-        labelList.append([label, text])
+        labelList.append([label, tokens, ID])
         textResults += str(label) + ": " + text + '\n'
         i += 1
+    elif label == '5':
+        print('expanded tweet:')
+        print(textwrap.fill(originalTweets[ID], width=150, drop_whitespace=False), end='\n\n')
     elif label == '7':
         print("Skipped\n")
         skipped.append(i)

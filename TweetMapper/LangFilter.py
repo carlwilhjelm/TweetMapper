@@ -1,11 +1,9 @@
 # takes tweet ID based dictionary and filters out english only tweets
+# outputs dictionary of ID's and text only
+import json
 from LocalDir import *
 from langdetect import detect
 import pickle
-import re
-
-# regex to find tweet text
-textRegex = re.compile('(?<="text":").*?(?=",")')
 
 with open(rawTweetByIdDictFile, 'rb') as f:
     tweetDict = pickle.load(f)
@@ -17,11 +15,18 @@ foreignLanguageTotal = 0
 failedTotal = 0
 
 for ID, fullTweet in tweetDict.items():
-    tweet = textRegex.search(fullTweet).group()
+    tweet = json.loads(fullTweet)
+    if tweet['lang'] != 'en':
+        foreignLanguageTotal += 1
+        continue
+    try:
+        text = tweet['extended_tweet']['full_text']
+    except:
+        text = tweet['text']
     total += 1
     try:
-        if detect(tweet) == 'en':
-            englishOnlyTweets[ID] = fullTweet
+        if detect(text) == 'en':
+            englishOnlyTweets[ID] = text
             englishOnlyTotal += 1
         else:
             foreignLanguageTotal += 1
@@ -36,5 +41,5 @@ results = "Total tweets = " + str(total) + \
 with open(langFilterTextResultsFile, 'w') as f:
     f.write(results)
 
-with open(tweetByIdDictFile, 'wb') as f:
+with open(allEnglishTweetsByIdDictFile, 'wb') as f:
     pickle.dump(englishOnlyTweets, f)

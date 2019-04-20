@@ -1,14 +1,11 @@
 from LocalDir import *
 from collections import defaultdict
-import nltk
 import pickle
 import random
+from TweetToTokens import tweetToTokens
 
-# nltk lematizer
-wnl = nltk.WordNetLemmatizer()
-
-# take labeled tweets made from LabelMaker.py of the form ["label", "text"]
-with open(labeledAmbiguousTweetSetListFile, 'rb') as f:
+# take labeled tweets made from LabelMakerFromPairwise.py of the form ["label", "text"]
+with open(labeledTweetsFile, 'rb') as f:
     labeledTweets = pickle.load(f)
 
 # partition lists of tweets into training and testing
@@ -19,25 +16,6 @@ def trainTestPartition(listIn):
     train = listIn[:-(n//m)]
     test = listIn[-(n//m):]
     return train, test
-
-# clean the tweet of common superfluous text
-def clean(textIn):
-    text = textIn.split()
-    result = []
-    for word in text:
-        if word[0].isalpha():
-            result.append(word)
-    return " ".join(result)
-
-# make sure tweet processing is uniform
-def tweetToTokens(tweetIn):
-    text = wnl.lemmatize(clean(tweetIn)).lower()
-    # text = clean(tweetIn).lower()
-    # text = tweetIn.lower()
-    # print(text)
-    tokens = nltk.word_tokenize(text)
-    # tokens = nltk.pos_tag(tokens)
-    return(tokens)
 
 # N GRAM: sum total instances of relevant words in tweet
 # @param trainingSet in is array of tokenized and cleaned tweets
@@ -90,8 +68,7 @@ def predict(negWordDictIn, posWordDictIn, testSetIn, totalPosIn, totalNegIn, sum
 # separate list into affirmative and negative
 trueImplicit = []
 falseImplicit = []
-for label, text in labeledTweets:
-    tokens = tweetToTokens(text)
+for label, tokens, ID in labeledTweets:
     if label == '1':
         trueImplicit.append(tokens)
     else:
@@ -100,13 +77,14 @@ print("true implicit = " + str(len(trueImplicit)))
 print("false implicit = " + str(len(falseImplicit)))
 
 # number of cycles
-k = 1
+k = 50
 # n for ngrams
 nGramSize = 1
-# initialize values for calculating accuracy levels
-avgAccuracy = 0
-lowestAccuracy = 1
-highestAccuracy = 0
+# initialize values for calculating accuracy, specificity, and sensitivity
+avgAccuracy, lowestAccuracy, highestAccuracy = 0, 1, 0
+avgSpecificity, lowestSpecificity, highestSpecificity = 0, 1, 0
+avgSensitivity, lowestSensitivity, highestSensitivity = 0, 1, 0
+
 for i in range(k):
     # parse data into separate training and testing sets
     trainTrue, testTrue = trainTestPartition(trueImplicit)
@@ -116,28 +94,49 @@ for i in range(k):
     trueWordDict, totalTrue = wordSumNGram(trainTrue, nGramSize)
     sumTotal = len(falseWordDict) + len(trueWordDict)
     # determine number of correct predictions in each set
-    neg0, pos0, sortedPredictions0 = predict(trueWordDict, falseWordDict, testFalse, totalFalse, totalTrue, sumTotal, nGramSize)
-    neg1, pos1, sortedPredictions1 = predict(falseWordDict, trueWordDict, testTrue, totalTrue, totalFalse, sumTotal, nGramSize)
-
-    for i in range(10):
-        print(sortedPredictions0[i])
-    print()
-    for i in range(10):
-        print(sortedPredictions1[i])
+    falseNeg, trueNeg, sortedPredictions0 = predict(trueWordDict, falseWordDict, testFalse, totalFalse, totalTrue, sumTotal, nGramSize)
+    falsePos, truePos, sortedPredictions1 = predict(falseWordDict, trueWordDict, testTrue, totalTrue, totalFalse, sumTotal, nGramSize)
 
     # calculate accuracy
-    correct = (pos0 + pos1)
-    wrong = (neg0 + neg1)
+    correct = (trueNeg + truePos)
+    wrong = (falseNeg + falsePos)
     accuracy = correct / (correct + wrong)
-
-    # record results
-    if accuracy < lowestAccuracy:
-        lowestAccuracy = accuracy
-    if accuracy > highestAccuracy:
-        highestAccuracy = accuracy
+    if accuracy < lowestAccuracy: lowestAccuracy = accuracy
+    if accuracy > highestAccuracy: highestAccuracy = accuracy
     avgAccuracy += accuracy
 
-accuracy = avgAccuracy / k
-print("Highest accuracy = " + str(highestAccuracy))
-print("Average accuracy = " + str(accuracy))
-print("Lowest accuracy = " + str(lowestAccuracy))
+    # record sensitivity TP/P and specificity TN/N
+    sensitivity = truePos / (truePos + falsePos)
+    specificity = trueNeg / (trueNeg + falseNeg)
+
+    # record sensitivity results
+    if sensitivity < lowestSensitivity: lowestSensitivity = sensitivity
+    if sensitivity > highestSensitivity: highestSensitivity = sensitivity
+    avgSensitivity += sensitivity
+
+    # record specificity results
+    if specificity < lowestSpecificity: lowestSpecificity = specificity
+    if specificity > highestSpecificity: highestSpecificity = specificity
+    avgSpecificity += specificity
+
+
+print("Results for Naive Bayes Model")
+print("Results for k = " + str(k) + " iterations")
+
+avgAccuracy = avgAccuracy / k
+print("Accuracy:")
+print("\thigh = " + str(highestAccuracy))
+print("\tavg = " + str(avgAccuracy))
+print("\tlow = " + str(lowestAccuracy))
+
+avgSensitivity = avgSensitivity / k
+print("Sensitivity:")
+print("\thigh = " + str(highestSensitivity))
+print("\tavg = " + str(avgSensitivity))
+print("\tlow = " + str(lowestSensitivity))
+
+avgSpecificity = avgSpecificity / k
+print("Specificity:")
+print("\thigh = " + str(highestSpecificity))
+print("\tavg = " + str(avgSpecificity))
+print("\tlow = " + str(lowestSpecificity))

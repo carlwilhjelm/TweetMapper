@@ -9,16 +9,17 @@ textSet = []
 textResults = ""
 
 # use a dict to check if tweet has been logged
-# if not, add to list
-for key, textScoreTuple in reversed(list):
-    if textScoreTuple[0] not in checkDict:
-        checkDict[textScoreTuple[0]] = True
-        textSet.append(textScoreTuple)
+# if not, add to list format textSet[key] = [text, score]
+for score, tokens, ID in reversed(list):
+    text = " ".join(tokens)
+    if text not in checkDict:
+        checkDict[text] = True
+        textSet.append([score, tokens, ID])
 
 for elem in textSet:
     textResults += str(elem) + "\n"
 
-with open(pairwiseRankSetAmbiguousTweetsTextResultsFile, 'w') as f:
+with open(pairwiseRankSetAmbiguousTweetsResultsFile, 'w', encoding=twitterEncoding) as f:
     f.write(textResults)
 
 with open(pairwiseRankSetAmbiguousTweetsListFile, 'wb') as f:

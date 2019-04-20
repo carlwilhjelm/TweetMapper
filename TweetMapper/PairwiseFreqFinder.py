@@ -19,7 +19,7 @@ def frequencyFinder(fileNameIn):
             else:
                 frequency[("Single Word Tweet", text[0])] += 1
         except Exception as e:
-            print(str(e) + '\n' + ID + '\n' + text)
+            print(str(e) + '\n' + ID + '\n' + " ".join(text))
 
     length = len(tweets)
     for key in frequency:
@@ -41,7 +41,7 @@ textResults = ""
 for elem in sortedByValue:
     textResults += str(elem) + "\n"
 
-with open(pairwiseRelFreqTextResultsFile, 'w') as f:
+with open(pairwiseRelFreqTextResultsFile, 'w', encoding="utf16") as f:
     f.write(textResults)
 
 with open(pairwiseRelFreqListFile, 'wb') as f:
